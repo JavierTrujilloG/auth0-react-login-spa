@@ -1,20 +1,48 @@
 import configJson from "./auth_config.json";
 
 export function getConfig() {
-  // Configure the audience here. By default, it will take whatever is in the config
-  // (specified by the `audience` key) unless it's the default value of "YOUR_API_IDENTIFIER" (which
-  // is what you get sometimes by using the Auth0 sample download tool from the quickstart page, if you
-  // don't have an API).
-  // If this resolves to `null`, the API page changes to show some helpful info about what to do
-  // with the audience.
-  const audience =
-    configJson.audience && configJson.audience !== "YOUR_API_IDENTIFIER"
-      ? configJson.audience
-      : null;
+  // Try to access @@config@@ object available in UL runtime
+  // if it's not available, fallback to local config file
+  let config;
+  try {
+    config = JSON.parse(
+      decodeURIComponent(escape(window.atob("@@config@@")))
+    );
 
-  return {
-    domain: configJson.domain,
-    clientId: configJson.clientId,
-    ...(audience ? { audience } : null),
-  };
+    var leeway = config.internalOptions.leeway;
+    if (leeway) {
+      var convertedLeeway = parseInt(leeway);
+
+      if (!isNaN(convertedLeeway)) {
+        config.internalOptions.leeway = convertedLeeway;
+      }
+    }
+
+    config = Object.assign(
+      {
+        overrides: {
+          __tenant: config.auth0Tenant,
+          __token_issuer: config.authorizationServer.issuer,
+        },
+        domain: config.auth0Domain,
+        clientId: config.clientID,
+        redirectUri: config.callbackURL,
+        responseType: "code",
+      },
+      config.internalOptions
+    );
+  } catch (e) {
+    const audience =
+      configJson.audience && configJson.audience !== "YOUR_API_IDENTIFIER"
+        ? configJson.audience
+        : null;
+      
+    config = {
+      domain: configJson.domain,
+      clientId: configJson.clientId,
+      ...(audience ? { audience } : null),
+    };
+  }
+  console.log(config);
+  return config;
 }

@@ -13,6 +13,8 @@ const styles = {}; // TODO
 
 export default function Login() {
   const [authError, setAuthError] = useState(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const validationOpt = { resolver: yupResolver(LoginSchema) };
   const {
     register,
@@ -23,13 +25,35 @@ export default function Login() {
   const {
     loginWithUsernamePassword,
     loginWithGoogle,
-    loginWithFacebook
+    loginWithFacebook,
+    signUp,
+    signupAndLogin
   } = useContext(AuthContext);
 
 
   async function onSubmit(data) {
     try {
       await loginWithUsernamePassword(data.username, data.password);
+    } catch (err) {
+      setAuthError(err.description);
+      console.log(err);
+    }
+  }
+
+  async function onSignup(e) {
+    e.preventDefault();
+    try {
+      await signUp(username, password);
+    } catch (err) {
+      setAuthError(err.description);
+      console.log(err);
+    }
+  }
+
+  async function onSignUpAndLogin(e) {
+    e.preventDefault();
+    try {
+      await signupAndLogin(username, password);
     } catch (err) {
       setAuthError(err.description);
       console.log(err);
@@ -75,6 +99,7 @@ export default function Login() {
               name="username"
               id="username"
               autoComplete="username"
+              onChange={({ target }) => setUsername(target.value)}
               className={
                 authError || errors.username ? styles.inputWithError : ""
               }
@@ -87,6 +112,7 @@ export default function Login() {
               placeholder="Password"
               name="password"
               id="password"
+              onChange={({ target }) => setPassword(target.value)}
               autoComplete="current-password"
               className={
                 authError || errors.password ? styles.inputWithError : ""
@@ -126,12 +152,18 @@ export default function Login() {
             <button
               type="button"
               className="link-button"
-              onClick={(e) => {
-                e.preventDefault();
-                // goToSignUp(); TODO
-              }}
+              onClick={onSignup}
             >
-              Register an account
+              Sign up
+            </button>
+          </p>
+          <p>
+            <button
+              type="button"
+              className="link-button"
+              onClick={onSignUpAndLogin}
+            >
+              SignUp And Login
             </button>
           </p>
         </div>

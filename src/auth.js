@@ -75,13 +75,39 @@ export function AuthProvider({ children }) {
     [webAuth]
   );
 
+
+  const signupAndLogin = useCallback(
+    (username, password, name) => {
+      return new Promise((resolve, reject) => {
+        webAuth.redirect.signupAndLogin(
+          {
+            connection: DATABASE_CONNECTION,
+            password: password,
+            email: username,
+            name,
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(result);
+          }
+        );
+      });
+    },
+    [webAuth]
+  );
+  
+
   const value = useMemo(
     () => ({
       loginWithUsernamePassword,
       loginWithGoogle,
-      signUp
+      signUp,
+      signupAndLogin
     }),
-    [loginWithGoogle, loginWithUsernamePassword, signUp]
+    [loginWithGoogle, loginWithUsernamePassword, signUp, signupAndLogin]
   );
 
   return (
