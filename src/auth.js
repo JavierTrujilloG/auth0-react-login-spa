@@ -1,13 +1,20 @@
-import React, { useCallback, useMemo, createContext, useContext, useState } from "react";
-import auth0 from "auth0-js";
-import { getConfig } from "./config";
+import React, {
+  useCallback,
+  useMemo,
+  createContext,
+  useContext,
+  useState,
+} from 'react';
+import auth0 from 'auth0-js';
+import { getConfig } from './config';
 
-const DATABASE_CONNECTION = "Username-Password-Authentication";
+const DATABASE_CONNECTION = 'Username-Password-Authentication';
 
+// Ignore this!
 export const AuthContext = createContext({
   loginWithUsernamePassword: (username, password) => {},
   loginWithGoogle: () => {},
-  signUp: (username, password, name) => {}
+  signUp: (username, password, name) => {},
 });
 
 const { domain, clientId } = getConfig();
@@ -19,14 +26,14 @@ export function AuthProvider({ children }) {
         domain,
         clientID: clientId,
         //redirectUri: process.env.REACT_APP_AUTH0_REDIRECT_URI,
-        responseType: "code",
+        responseType: 'code',
       }),
-    []
+    [],
   );
-  const [ existingUserError, setExistingError] = useState("");
+  const [existingUserError, setExistingError] = useState('');
   const loginWithUsernamePassword = useCallback((username, password) => {
     const urlParams = new URLSearchParams(window.location.search);
-    const stateParam = urlParams.get("state") || "";
+    const stateParam = urlParams.get('state') || '';
     return new Promise(
       (resolve, reject) => {
         webAuth.login(
@@ -42,14 +49,14 @@ export function AuthProvider({ children }) {
               return;
             }
             resolve(result);
-          }
+          },
         );
       },
-      [webAuth]
+      [webAuth],
     );
   });
   const loginWithGoogle = useCallback(() => {
-    webAuth.authorize({ connection: "google-oauth2" });
+    webAuth.authorize({ connection: 'google-oauth2' });
   }, [webAuth]);
 
   const signUp = useCallback(
@@ -68,13 +75,12 @@ export function AuthProvider({ children }) {
               return;
             }
             resolve(result);
-          }
+          },
         );
       });
     },
-    [webAuth]
+    [webAuth],
   );
-
 
   const signupAndLogin = useCallback(
     (username, password, name) => {
@@ -92,27 +98,22 @@ export function AuthProvider({ children }) {
               return;
             }
             resolve(result);
-          }
+          },
         );
       });
     },
-    [webAuth]
+    [webAuth],
   );
-  
 
   const value = useMemo(
     () => ({
       loginWithUsernamePassword,
       loginWithGoogle,
       signUp,
-      signupAndLogin
+      signupAndLogin,
     }),
-    [loginWithGoogle, loginWithUsernamePassword, signUp, signupAndLogin]
+    [loginWithGoogle, loginWithUsernamePassword, signUp, signupAndLogin],
   );
 
-  return (
-    <AuthContext.Provider value={value}>
-        {children}
-    </AuthContext.Provider>
-  );
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}

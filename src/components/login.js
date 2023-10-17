@@ -23,12 +23,14 @@ export default function Login() {
         url: 'https://kzmnauw4utp33ch3e7vxypwahq0qcvto.lambda-url.eu-central-1.on.aws/',
         method: 'POST',
         data: { identifier },
+        responseType: 'json',
         validateStatus: () => true,
       });
 
       if (resp.status === 200) {
         // User record found
         const user = resp.data.user;
+        console.log(typeof resp.data, resp.data.user);
         // Check if user has a GIN associated
         if (!user.GIN) {
           throw new Error(
@@ -138,7 +140,7 @@ export default function Login() {
               checked
               value="send_otp"></input>
             <label className="pl-2" for="send_otp">
-              Send an e-mail to {identifier}
+              Send an e-mail to {email}
             </label>
             <button
               className="mt-8 w-full flex justify-center items-center p-2 font-sans text-white rounded-md shadow-lg px-9 bg-orange-500 shadow-cyan-100 shadow-sm hover:shadow-lg border transition duration-150"
@@ -147,7 +149,7 @@ export default function Login() {
             </button>
             <br />
             <p className="text-xl mb-2"> Need help ? </p>
-            <p className="underline cursor-pointer">
+            <p className="underline cursor-pointer" onClick={() => setStep(3)}>
               {' '}
               Log in with your password instead{' '}
             </p>
@@ -179,7 +181,7 @@ export default function Login() {
             </button>
             <br />
             <p className="text-xl mb-2"> Need help ? </p>
-            <p className="underline cursor-pointer">
+            <p className="underline cursor-pointer" onClick={() => setStep(3)}>
               {' '}
               Log in with your password instead{' '}
             </p>
